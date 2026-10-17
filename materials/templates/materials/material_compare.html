@@ -1,0 +1,42 @@
+<!doctype html>
+<html lang="zh-Hans">
+<head>
+  <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>材料特性对比</title>
+  <style>
+    .material-page { max-width:1500px; margin:0 auto; }
+    .comparison-wrap { overflow:auto; border-radius:13px; }
+    .comparison { min-width:760px; }
+    .comparison th:first-child { min-width:180px; }
+    .comparison td { white-space:pre-line; overflow-wrap:anywhere; }
+    .material-header { min-width:230px; }
+    .material-header a { font-weight:700; text-decoration:none; }
+    .condition { color:var(--muted); font-size:12px; }
+    .comparison-notes { color:var(--muted); font-size:13px; }
+  </style>
+</head>
+<body>
+  {% include "includes/user_toolbar.html" %}
+  {% include "includes/main_nav.html" %}
+  <main class="material-page">
+    <p><a href="{% url 'materials:list' %}">返回材料列表</a></p>
+    <h1>材料特性对比</h1>
+    {% if error %}<p class="message">{{ error }}</p>{% endif %}
+    {% if materials %}
+      <p class="comparison-notes">按特性条目并排展示原始实验条件和数据。原表格包含不同单位与描述性数据，因此这里保留原始值，不对异构指标做误导性的统一数值图表。</p>
+      <div class="comparison-wrap">
+        <table class="comparison">
+          <thead><tr><th>特性条目</th>{% for material in materials %}<th class="material-header"><a href="{% url 'materials:detail' material.pk %}">{{ material.name }}</a><br><span class="muted">{{ material.category.name }}</span></th>{% endfor %}</tr></thead>
+          <tbody>
+            {% for row in comparison_rows %}
+              <tr><th>{{ row.name }}</th>
+                {% for cell in row.cells %}<td>{% for feature in cell %}{% if feature.condition %}<span class="condition">条件：{{ feature.condition }}</span><br>{% endif %}{{ feature.result|default:"—" }}{% if not forloop.last %}<hr>{% endif %}{% empty %}<span class="muted">—</span>{% endfor %}</td>{% endfor %}
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    {% endif %}
+  </main>
+</body>
+</html>

@@ -1,0 +1,95 @@
+<!doctype html>
+<html lang="zh-Hans">
+<head>
+  <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>材料特性 · 课题组文献管理系统</title>
+  <style>
+    .material-page { max-width: 1440px; margin: 0 auto; }
+    .material-heading { display:flex; align-items:flex-start; justify-content:space-between; gap:20px; flex-wrap:wrap; }
+    .material-heading h1 { margin-bottom:6px; }
+    .material-actions { display:flex; align-items:center; gap:10px; flex-wrap:wrap; }
+    .material-button { display:inline-flex; align-items:center; justify-content:center; min-height:40px; padding:8px 14px; border-radius:9px; background:#3779e8; color:#fff !important; font-weight:650; text-decoration:none; box-shadow:0 5px 13px rgba(55,121,232,.16); }
+    .material-button.secondary { background:#fff; color:#34415a !important; border:1px solid var(--line); box-shadow:none; }
+    .material-tabs { display:flex; gap:8px; overflow-x:auto; padding:5px 2px 12px; margin:20px 0 10px; scrollbar-width:thin; }
+    .material-tabs a { flex:0 0 auto; padding:8px 13px; border:1px solid var(--line); border-radius:999px; background:#fff; color:#536078; text-decoration:none; white-space:nowrap; }
+    .material-tabs a.active { border-color:#3779e8; background:#eaf1ff; color:#245bb7; font-weight:700; }
+    .material-search { display:flex; align-items:center; gap:10px; max-width:none !important; margin:0 0 14px; padding:14px !important; }
+    .material-search input { flex:1; min-width:180px; }
+    .material-search button { flex:0 0 auto; }
+    .material-summary { margin:0 0 8px; color:var(--muted); font-size:13px; }
+    .material-table-wrap { overflow-x:auto; border-radius:13px; }
+    .material-table { min-width:720px; margin:0 0 14px; }
+    .material-table th:first-child, .material-table td:first-child { width:44px; min-width:44px; }
+    .material-table input[type=checkbox] { width:16px; height:16px; accent-color:#3779e8; }
+    .material-name { font-weight:700; text-decoration:none; }
+    .feature-chips { display:flex; flex-wrap:wrap; gap:5px; margin-top:6px; }
+    .feature-chip { display:inline-block; padding:2px 7px; border-radius:999px; background:#f0f4fa; color:#63728a; font-size:12px; }
+    .material-compare-action { display:flex; justify-content:space-between; align-items:center; gap:14px; flex-wrap:wrap; margin:12px 0 0; padding:13px 16px; border:1px solid var(--line); border-radius:12px; background:#fff; }
+    .material-compare-action p { margin:0; color:var(--muted); font-size:13px; }
+    .pagination { display:flex; align-items:center; justify-content:center; gap:6px; flex-wrap:wrap; margin:20px 0 35px; }
+    .pagination a, .pagination span { padding:7px 11px; border:1px solid var(--line); border-radius:8px; background:#fff; text-decoration:none; }
+    .pagination .current { border-color:#3779e8; background:#3779e8; color:white; }
+    @media (max-width:760px) { .material-search { flex-wrap:wrap; } .material-search input { flex-basis:100%; } }
+  </style>
+</head>
+<body>
+  {% include "includes/user_toolbar.html" %}
+  {% include "includes/main_nav.html" %}
+  <main class="material-page">
+    <header class="material-heading">
+      <div><h1>材料特性</h1><p class="muted">按材料类别浏览，或搜索材料名称、特性、实验条件和结果。</p></div>
+      <div class="material-actions">
+        <a class="material-button" href="{% url 'materials:download' %}">下载最新 Excel</a>
+        {% if can_manage %}<a class="material-button secondary" href="{% url 'admin:materials_material_changelist' %}">管理材料数据</a>{% endif %}
+      </div>
+    </header>
+
+    <nav class="material-tabs" aria-label="材料分类">
+      <a class="{% if not selected_category %}active{% endif %}" href="{% url 'materials:list' %}?q={{ query|urlencode }}">全部 <span>{{ page_obj.paginator.count }}</span></a>
+      {% for category in categories %}
+        <a class="{% if selected_category == category.pk|stringformat:'s' %}active{% endif %}" href="{% url 'materials:list' %}?category={{ category.pk }}&q={{ query|urlencode }}">{{ category.name }} <span>{{ category.material_count }}</span></a>
+      {% endfor %}
+    </nav>
+
+    <form class="material-search" method="get">
+      {% if selected_category %}<input type="hidden" name="category" value="{{ selected_category }}">{% endif %}
+      <input type="search" name="q" value="{{ query }}" placeholder="搜索材料名称、类别、特性、实验条件或数据">
+      <button type="submit">搜索</button>
+      {% if query %}<a href="{% url 'materials:list' %}{% if selected_category %}?category={{ selected_category }}{% endif %}">清除</a>{% endif %}
+    </form>
+
+    <p class="material-summary">共 {{ page_obj.paginator.count }} 种材料{% if page_obj.paginator.num_pages > 1 %} · 第 {{ page_obj.number }} / {{ page_obj.paginator.num_pages }} 页{% endif %}</p>
+    <form method="post" action="{% url 'materials:compare' %}">
+      {% csrf_token %}
+      <div class="material-table-wrap">
+        <table class="material-table">
+          <thead><tr><th><input type="checkbox" aria-label="选择本页全部材料" onclick="document.querySelectorAll('.material-select').forEach((box) => box.checked = this.checked)"></th><th>材料名称</th><th>类别</th><th>特性条目</th></tr></thead>
+          <tbody>
+            {% for material in page_obj %}
+              <tr>
+                <td><input class="material-select" type="checkbox" name="material_ids" value="{{ material.pk }}" aria-label="选择{{ material.name }}"></td>
+                <td><a class="material-name" href="{% url 'materials:detail' material.pk %}">{{ material.name }}</a>
+                  <div class="feature-chips">{% for feature in material.features.all|slice:":4" %}<span class="feature-chip">{{ feature.name }}</span>{% endfor %}{% if material.features.count > 4 %}<span class="feature-chip">等 {{ material.features.count }} 项</span>{% endif %}</div>
+                </td>
+                <td>{{ material.category.name }}</td>
+                <td>{{ material.features.count }}</td>
+              </tr>
+            {% empty %}<tr><td colspan="4" class="muted">没有找到符合条件的材料。</td></tr>{% endfor %}
+          </tbody>
+        </table>
+      </div>
+      <div class="material-compare-action"><p>选择 2–6 种材料，可并排对比已有特性数据。</p><button type="submit">对比所选材料</button></div>
+    </form>
+
+    {% if page_obj.paginator.num_pages > 1 %}
+      <nav class="pagination" aria-label="分页">
+        {% if page_obj.has_previous %}<a href="?q={{ query|urlencode }}&category={{ selected_category }}&page={{ page_obj.previous_page_number }}">上一页</a>{% endif %}
+        {% for number in page_obj.paginator.page_range %}
+          {% if number == page_obj.number %}<span class="current">{{ number }}</span>{% else %}<a href="?q={{ query|urlencode }}&category={{ selected_category }}&page={{ number }}">{{ number }}</a>{% endif %}
+        {% endfor %}
+        {% if page_obj.has_next %}<a href="?q={{ query|urlencode }}&category={{ selected_category }}&page={{ page_obj.next_page_number }}">下一页</a>{% endif %}
+      </nav>
+    {% endif %}
+  </main>
+</body>
+</html>

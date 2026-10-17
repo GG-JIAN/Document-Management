@@ -5,7 +5,7 @@
   <a href="{% url 'catalog:publications' %}"><img class="nav-icon" src="{% static 'members/icons/papers.png' %}" alt=""><span>论文文献</span></a>
   <a href="{% url 'catalog:keywords' %}"><img class="nav-icon" src="{% static 'members/icons/keywords.png' %}" alt=""><span>关键词</span></a>
   <a href="{% url 'catalog:patents' %}"><img class="nav-icon" src="{% static 'members/icons/patents.png' %}" alt=""><span>专利</span></a>
-  <a href="{% url 'members:materials' %}"><img class="nav-icon" src="{% static 'members/icons/materials.png' %}" alt=""><span>材料特性</span></a>
+  <a href="{% url 'materials:list' %}"><img class="nav-icon" src="{% static 'members/icons/materials.png' %}" alt=""><span>材料特性</span></a>
   <a href="{% url 'changes:list' %}"><img class="nav-icon" src="{% static 'members/icons/requests.png' %}" alt=""><span>资料申请</span></a>
   {% if user.is_superuser or user.role == "admin" %}<a href="{% url 'admin:index' %}"><img class="nav-icon" src="{% static 'members/icons/admin.png' %}" alt=""><span>后台管理</span></a>{% endif %}
   {% if user.is_superuser %}<a href="{% url 'system_backups:list' %}"><img class="nav-icon" src="{% static 'members/icons/admin.png' %}" alt=""><span>数据备份</span></a>{% endif %}

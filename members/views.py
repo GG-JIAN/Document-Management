@@ -60,7 +60,3 @@ def member_detail(request, pk):
     return render(request, "members/member_detail.html", {"member": member})
 
 
-@login_required
-def materials_placeholder(request):
-    return render(request, "members/materials_placeholder.html")
-

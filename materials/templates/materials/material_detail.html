@@ -1,0 +1,47 @@
+<!doctype html>
+<html lang="zh-Hans">
+<head>
+  <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{{ material.name }} · 材料特性</title>
+  <style>
+    .material-page { max-width:1280px; margin:0 auto; }
+    .material-actions { display:flex; gap:10px; flex-wrap:wrap; margin:14px 0 22px; }
+    .material-button { display:inline-flex; align-items:center; min-height:38px; padding:7px 13px; border:1px solid var(--line); border-radius:9px; background:#fff; color:#3779e8; text-decoration:none; font-weight:650; }
+    .material-category { display:inline-flex; padding:5px 10px; border-radius:999px; background:#eaf1ff; color:#315e9f; font-size:13px; }
+    .feature-card { margin:14px 0; padding:20px 22px; border:1px solid var(--line); border-radius:13px; background:#fff; box-shadow:var(--shadow); }
+    .feature-card h2 { margin:0 0 12px; font-size:18px; }
+    .feature-data { display:grid; grid-template-columns:minmax(130px,180px) 1fr; gap:8px 16px; }
+    .feature-data dt { color:var(--muted); font-size:13px; font-weight:650; }
+    .feature-data dd { margin:0 !important; white-space:pre-line; overflow-wrap:anywhere; }
+    .long-text { white-space:pre-line; overflow-wrap:anywhere; }
+    @media(max-width:700px) { .feature-card { padding:16px; } .feature-data { grid-template-columns:1fr; gap:4px; } .feature-data dd { margin-bottom:12px !important; } }
+  </style>
+</head>
+<body>
+  {% include "includes/user_toolbar.html" %}
+  {% include "includes/main_nav.html" %}
+  <main class="material-page">
+    <p><a href="{% url 'materials:list' %}">返回材料列表</a></p>
+    <span class="material-category">{{ material.category.name }}</span>
+    <h1>{{ material.name }}</h1>
+    <div class="material-actions">
+      <a class="material-button" href="{% url 'materials:download' %}">下载最新 Excel</a>
+      {% if can_manage %}<a class="material-button" href="{% url 'admin:materials_material_change' material.pk %}">编辑该材料</a>{% endif %}
+    </div>
+
+    <h2>特性数据</h2>
+    {% for feature in material.features.all %}
+      <section class="feature-card">
+        <h2>{{ feature.name }}</h2>
+        <dl class="feature-data">
+          <dt>实验条件</dt><dd>{% if feature.condition %}{{ feature.condition }}{% else %}—{% endif %}</dd>
+          <dt>实验结果或数据</dt><dd>{% if feature.result %}{{ feature.result }}{% else %}—{% endif %}</dd>
+        </dl>
+      </section>
+    {% empty %}<p class="muted">尚未录入特性数据。</p>{% endfor %}
+
+    {% if material.notes %}<section class="feature-card"><h2>特殊备注</h2><div class="long-text">{{ material.notes }}</div></section>{% endif %}
+    {% if material.references %}<section class="feature-card"><h2>引用文献</h2><div class="long-text">{{ material.references }}</div></section>{% endif %}
+  </main>
+</body>
+</html>
