@@ -38,6 +38,19 @@ class Material(models.Model):
         return self.name
 
 
+class MaterialCharacteristic(models.Model):
+    name = models.CharField("特性条目名称", max_length=180, unique=True)
+    sort_order = models.PositiveIntegerField("排序", default=0)
+
+    class Meta:
+        ordering = ("sort_order", "name")
+        verbose_name = "材料特性条目"
+        verbose_name_plural = "材料特性条目"
+
+    def __str__(self):
+        return self.name
+
+
 class MaterialFeature(models.Model):
     material = models.ForeignKey(
         Material, verbose_name="材料", on_delete=models.CASCADE, related_name="features"

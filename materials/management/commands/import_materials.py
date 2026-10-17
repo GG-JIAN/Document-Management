@@ -4,7 +4,7 @@ from django.core.management.base import BaseCommand, CommandError
 from django.db import transaction
 from openpyxl import load_workbook
 
-from materials.models import Material, MaterialCategory, MaterialFeature
+from materials.models import Material, MaterialCategory, MaterialCharacteristic, MaterialFeature
 
 
 class Command(BaseCommand):
@@ -69,6 +69,10 @@ class Command(BaseCommand):
                     material.save(update_fields=("notes", "references", "source_row", "updated_at"))
                     material.features.all().delete()
 
+                for order, (name, _condition, _result) in enumerate(features):
+                    MaterialCharacteristic.objects.get_or_create(
+                        name=name, defaults={"sort_order": order}
+                    )
                 MaterialFeature.objects.bulk_create([
                     MaterialFeature(
                         material=material,

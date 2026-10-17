@@ -1,7 +1,8 @@
 from django.contrib import admin
+from django import forms
 
 from accounts.permissions import can_manage_records
-from .models import Material, MaterialCategory, MaterialFeature
+from .models import Material, MaterialCategory, MaterialCharacteristic, MaterialFeature
 
 
 class ManagerOnlyAdmin:
@@ -29,8 +30,33 @@ class MaterialCategoryAdmin(ManagerOnlyAdmin, admin.ModelAdmin):
         return obj.materials.count()
 
 
+class MaterialFeatureInlineForm(forms.ModelForm):
+    name = forms.ModelChoiceField(
+        label="特性条目",
+        queryset=MaterialCharacteristic.objects.none(),
+        empty_label="请选择特性条目",
+    )
+
+    class Meta:
+        model = MaterialFeature
+        fields = ("name", "condition", "result", "sort_order")
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields["name"].queryset = MaterialCharacteristic.objects.order_by("sort_order", "name")
+        if self.instance.pk:
+            characteristic = MaterialCharacteristic.objects.filter(name=self.instance.name).first()
+            if characteristic:
+                self.initial["name"] = characteristic.pk
+
+    def clean_name(self):
+        characteristic = self.cleaned_data["name"]
+        return characteristic.name
+
+
 class MaterialFeatureInline(admin.TabularInline):
     model = MaterialFeature
+    form = MaterialFeatureInlineForm
     extra = 1
     ordering = ("sort_order", "id")
     fields = ("name", "condition", "result", "sort_order")
@@ -60,3 +86,11 @@ class MaterialFeatureAdmin(ManagerOnlyAdmin, admin.ModelAdmin):
     search_fields = ("material__name", "name", "condition", "result")
     autocomplete_fields = ("material",)
     list_per_page = 50
+
+
+@admin.register(MaterialCharacteristic)
+class MaterialCharacteristicAdmin(ManagerOnlyAdmin, admin.ModelAdmin):
+    list_display = ("name", "sort_order")
+    search_fields = ("name",)
+    ordering = ("sort_order", "name")
+    list_per_page = 100
