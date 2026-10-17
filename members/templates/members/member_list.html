@@ -1,0 +1,45 @@
+<!doctype html>
+<html lang="zh-Hans">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>课题组成员 · 文献管理系统</title>
+  <style>
+    body { font-family: system-ui, sans-serif; max-width: 960px; margin: 3rem auto; padding: 0 1rem; color: #202938; }
+    header { display: flex; align-items: center; justify-content: space-between; gap: 1rem; }
+    nav { display: flex; gap: 1rem; flex-wrap: wrap; border-bottom: 1px solid #dce2e8; padding-bottom: 1rem; }
+    table { width: 100%; border-collapse: collapse; margin-top: 1.5rem; }
+    th, td { border-bottom: 1px solid #dce2e8; padding: .8rem; text-align: left; vertical-align: top; }
+    th { background: #f4f7fa; }
+    .muted { color: #657286; }
+    a { color: #155eef; }
+  </style>
+</head>
+<body>{% include "includes/user_toolbar.html" %}
+  <header>
+    <div>
+      <h1>研究资料总览</h1>
+      <p class="muted">欢迎使用课题组文献管理系统，集中查看成员、项目与学术成果。</p>
+    </div>
+  </header>
+  {% include "includes/main_nav.html" %}
+  <section class="cards dashboard-stats">
+    <a class="card" href="{% url 'members:list' %}">课题组成员<span class="number">{{ member_total }}</span></a>
+    <a class="card" href="{% url 'catalog:projects' %}">参与项目<span class="number">{{ project_total }}</span></a>
+    <a class="card" href="{% url 'catalog:publications' %}">论文文献<span class="number">{{ publication_total }}</span></a>
+    <a class="card" href="{% url 'catalog:patents' %}">专利成果<span class="number">{{ patent_total }}</span></a>
+  </section>
+  <form method="get"><label for="q">搜索成员</label> <input id="q" name="q" value="{{ request.GET.q }}" placeholder="姓名、身份或课题"> <button type="submit">搜索</button></form>
+  <table>
+    <thead><tr><th>姓名</th><th>身份</th><th>联系方式</th><th>在跟课题</th><th>项目</th><th>论文</th><th>专利</th></tr></thead>
+    <tbody>
+      {% for member in members %}
+        <tr><td><a href="{% url 'members:detail' member.pk %}">{{ member.name }}</a></td><td>{{ member.identity|default:"—" }}</td><td>{{ member.email|default:member.phone|default:"—" }}</td><td>{{ member.research_topic|linebreaksbr|default:"—" }}</td><td><a href="{% url 'catalog:projects' %}?member={{ member.pk }}">{{ member.project_count }}</a></td><td><a href="{% url 'catalog:publications' %}?member={{ member.pk }}">{{ member.publication_count }}</a></td><td><a href="{% url 'catalog:patents' %}?member={{ member.pk }}">{{ member.patent_count }}</a></td></tr>
+      {% empty %}
+        <tr><td colspan="4" class="muted">尚未添加成员。可先通过 Django 管理后台录入。</td></tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</body>
+</html>
+

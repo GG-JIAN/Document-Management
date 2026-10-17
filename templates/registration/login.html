@@ -1,0 +1,56 @@
+<!doctype html>
+<html lang="zh-Hans">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>登录 · 课题组文献管理系统</title>
+  <style>
+    * { box-sizing: border-box; }
+    body { min-height: 100vh; margin: 0; overflow: hidden; color: #fff; font-family: Inter, "Microsoft YaHei", sans-serif; background: #242e3d; }
+    .scene { position: fixed; inset: 0; overflow: hidden; background: radial-gradient(ellipse at 53% 30%, rgba(255,230,181,.9), transparent 24%), linear-gradient(170deg,#34445b 0%,#d09468 34%,#754c3a 60%,#1c2938 100%); }
+    .scene::before, .scene::after { position: absolute; inset: 0; content: ""; }
+    .scene::before { opacity: .8; background: linear-gradient(156deg,transparent 0 28%,#755943 28.2% 40%,transparent 40.2%), linear-gradient(205deg,transparent 0 31%,#5a483d 31.2% 43%,transparent 43.2%), linear-gradient(168deg,transparent 0 48%,#513f35 48.2% 62%,transparent 62.2%), linear-gradient(192deg,transparent 0 56%,#342f2c 56.2% 70%,transparent 70.2%); }
+    .scene::after { background: linear-gradient(90deg,rgba(10,18,29,.46),rgba(10,18,29,.03) 60%,rgba(10,18,29,.2)), linear-gradient(0deg,rgba(10,18,29,.58),transparent 65%); }
+    .sun { position: absolute; top: 12%; left: 43%; width: 240px; height: 240px; border-radius: 50%; background: rgba(255,240,206,.82); filter: blur(38px); }
+    .road { position: absolute; left: 29%; top: 41%; width: 40%; height: 59%; border: 3px solid rgba(255,237,198,.6); border-color: rgba(255,237,198,.6) transparent transparent rgba(255,237,198,.55); border-radius: 50%; transform: rotate(-25deg); filter: drop-shadow(0 0 8px rgba(255,220,155,.7)); }
+    .login-layout { position: relative; z-index: 1; display: grid; grid-template-columns: minmax(0,1fr) 390px; gap: clamp(30px,8vw,140px); align-items: center; width: min(1180px, calc(100% - 64px)); min-height: 100vh; margin: auto; }
+    .brand { align-self: center; max-width: 620px; padding: 30px; text-shadow: 0 4px 24px rgba(0,0,0,.25); }
+    .brand-mark { display: inline-flex; align-items: center; gap: 10px; margin-bottom: 24px; color: #ffe3b7; font-size: 13px; font-weight: 700; letter-spacing: .22em; }
+    .brand-mark::before { width: 34px; height: 1px; content: ""; background: #ffe3b7; }
+    .brand h1 { margin: 0; color: #fffaf0; font-family: Georgia, "KaiTi", serif; font-size: clamp(40px,6vw,74px); font-weight: 500; line-height: 1.18; letter-spacing: .06em; }
+    .brand p { max-width: 410px; margin-top: 22px; color: rgba(255,247,230,.85); font-size: 16px; line-height: 1.9; }
+    .login-card { padding: 34px; border: 1px solid rgba(255,255,255,.7); border-radius: 14px; background: rgba(255,255,255,.95); color: #25334a; box-shadow: 0 26px 80px rgba(14,23,37,.28); backdrop-filter: blur(16px); }
+    .login-card h2 { margin: 0 0 6px; font-size: 23px; }
+    .login-card .sub { margin: 0 0 24px; color: #7b879a; font-size: 13px; }
+    label { display: block; margin: 16px 0 7px; color: #49566d; font-size: 13px; font-weight: 650; }
+    input { width: 100%; height: 46px; padding: 0 13px; border: 1px solid #dce3ed; border-radius: 8px; background: #fbfcfe; color: #26354c; font: inherit; }
+    input:focus { outline: 0; border-color: #5b92eb; box-shadow: 0 0 0 3px rgba(55,121,232,.13); }
+    button { width: 100%; height: 46px; margin-top: 22px; border: 0; border-radius: 8px; background: linear-gradient(100deg,#3476e3,#438de9); color: #fff; font: inherit; font-weight: 700; cursor: pointer; box-shadow: 0 8px 18px rgba(55,121,232,.22); }
+    button:hover { filter: brightness(1.05); }
+    .error { padding: 10px 12px; border-radius: 7px; background: #fff0f0; color: #ae3644; font-size: 13px; }
+    .foot { margin: 20px 0 0; color: #98a2b2; font-size: 12px; text-align: center; }
+    @media (max-width: 760px) { body { overflow: auto; }.login-layout { grid-template-columns: 1fr; gap: 0; width: min(440px, calc(100% - 32px)); padding: 28px 0; }.brand { padding: 10px 5px 20px; }.brand h1 { font-size: 42px; }.brand p { margin-top: 12px; font-size: 14px; }.login-card { padding: 26px; }.scene::before { opacity: .5; } }
+  </style>
+</head>
+<body>
+  <div class="scene" aria-hidden="true"><div class="sun"></div><div class="road"></div></div>
+  <main class="login-layout">
+    <section class="brand">
+      <div class="brand-mark">LAB RESEARCH ARCHIVE</div>
+      <h1>让知识沉淀<br>让研究连接</h1>
+      <p>汇集课题组成员、项目与文献资料，让每一次探索都有迹可循。</p>
+    </section>
+    <section class="login-card">
+      <h2>欢迎回来</h2><p class="sub">登录课题组文献管理系统</p>
+      {% if form.errors %}<p class="error">用户名或密码不正确，请重试。</p>{% endif %}
+      <form method="post">{% csrf_token %}
+        <label for="id_username">用户名</label>{{ form.username }}
+        <label for="id_password">密码</label>{{ form.password }}
+        <input type="hidden" name="next" value="{{ next }}">
+        <button type="submit">登录系统</button>
+      </form>
+      <p class="foot">请使用管理员分配的账号登录</p>
+    </section>
+  </main>
+</body>
+</html>

@@ -1,0 +1,16 @@
+<!doctype html>
+<html lang="zh-Hans">
+<head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>{{ item.title }}</title>
+<style>body{font-family:system-ui,sans-serif;max-width:800px;margin:3rem auto;padding:0 1rem;color:#202938}a{color:#155eef}.muted{color:#657286}nav{display:flex;gap:1rem;flex-wrap:wrap;border-bottom:1px solid #dce2e8;padding-bottom:1rem}dt{font-weight:650;margin-top:1rem}dd{margin:.3rem 0 0}</style></head>
+<body>{% include "includes/user_toolbar.html" %}
+  {% include "includes/main_nav.html" %}
+  <p><a href="javascript:history.back()">返回列表</a></p><h1>{{ item.title }}</h1>
+  <dl>
+    {% if kind == "publication" %}<dt>作者</dt><dd>{{ item.authors|default:"—" }}</dd><dt>年份</dt><dd>{{ item.year|default:"—" }}</dd><dt>期刊或会议</dt><dd>{{ item.venue|default:"—" }}</dd><dt>DOI</dt><dd>{{ item.doi|default:"—" }}</dd><dt>摘要</dt><dd>{{ item.abstract|default:"—"|linebreaksbr }}</dd><dt>关键词</dt><dd>{% for keyword in item.keywords.all %}<a href="{% url 'catalog:publications' %}?keyword={{ keyword.pk }}">{{ keyword.name }}</a>{% if not forloop.last %}、{% endif %}{% empty %}—{% endfor %}</dd>
+    {% elif kind == "project" %}<dt>状态</dt><dd>{{ item.status|default:"—" }}</dd><dt>项目简介</dt><dd>{{ item.description|default:"—"|linebreaksbr }}</dd><dt>开始 / 结束</dt><dd>{{ item.start_date|default:"—" }} / {{ item.end_date|default:"—" }}</dd>
+    {% else %}<dt>专利号</dt><dd>{{ item.patent_number|default:"—" }}</dd><dt>状态</dt><dd>{{ item.status|default:"—" }}</dd><dt>申请日期</dt><dd>{{ item.application_date|default:"—" }}</dd>{% endif %}
+    <dt>课题组成员</dt><dd>{% for person in item.members.all %}<a href="{% url 'members:detail' person.pk %}">{{ person.name }}</a>{% if not forloop.last %}、{% endif %}{% empty %}—{% endfor %}</dd>
+    <dt>相关资料下载</dt><dd>{% for attachment in item.attachments.all %}<a href="{% url 'catalog:download_attachment' attachment.pk %}">{{ attachment.title }}</a>{% if not forloop.last %}<br>{% endif %}{% empty %}<span class="muted">暂无附件</span>{% endfor %}</dd>
+  </dl>
+</body>
+</html>

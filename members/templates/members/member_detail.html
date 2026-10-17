@@ -1,0 +1,10 @@
+<!doctype html>
+<html lang="zh-Hans">
+<head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>{{ member.name }} · 课题组成员</title>
+<style>body{font-family:system-ui,sans-serif;max-width:900px;margin:3rem auto;padding:0 1rem;color:#202938}nav{display:flex;gap:1rem;flex-wrap:wrap;border-bottom:1px solid #dce2e8;padding-bottom:1rem}a{color:#155eef}.cards{display:flex;gap:1rem;flex-wrap:wrap;margin:1.5rem 0}.card{min-width:9rem;padding:1rem;border:1px solid #dce2e8;border-radius:.6rem}.number{display:block;font-size:1.7rem;font-weight:700}</style></head>
+<body>{% include "includes/user_toolbar.html" %}{% include "includes/main_nav.html" %}
+<p><a href="{% url 'members:list' %}">返回成员列表</a></p><h1>{{ member.name }}</h1><p>{{ member.identity|default:"身份未填写" }}</p>
+<h2>联系方式与课题</h2><p>邮箱：{{ member.email|default:"—" }}</p><p>联系方式：{{ member.phone|default:"—" }}</p><p>在跟课题：{{ member.research_topic|linebreaksbr|default:"—" }}</p>
+{% if user.member_id == member.pk and not user.is_superuser and user.role == "member" %}<p><a href="{% url 'changes:new' %}">申请修改我的资料</a></p>{% endif %}
+<h2>参与记录</h2><div class="cards"><a class="card" href="{% url 'catalog:projects' %}?member={{ member.pk }}">项目<span class="number">{{ member.project_count }}</span></a><a class="card" href="{% url 'catalog:publications' %}?member={{ member.pk }}">论文<span class="number">{{ member.publication_count }}</span></a><a class="card" href="{% url 'catalog:patents' %}?member={{ member.pk }}">专利<span class="number">{{ member.patent_count }}</span></a></div>
+</body></html>

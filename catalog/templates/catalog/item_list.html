@@ -1,0 +1,35 @@
+<!doctype html>
+<html lang="zh-Hans">
+<head>
+  <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{{ title }} · 课题组文献管理系统</title>
+  <style>
+    body { font-family: system-ui, sans-serif; max-width: 960px; margin: 3rem auto; padding: 0 1rem; color: #202938; }
+    nav { display: flex; gap: 1rem; flex-wrap: wrap; border-bottom: 1px solid #dce2e8; padding-bottom: 1rem; }
+    table { width: 100%; border-collapse: collapse; margin-top: 1.5rem; }
+    th, td { border-bottom: 1px solid #dce2e8; padding: .8rem; text-align: left; vertical-align: top; }
+    th { background: #f4f7fa; } a { color: #155eef; } .muted { color: #657286; }
+    .metadata { display: grid; gap: .35rem; }
+    .metadata-row { line-height: 1.5; }
+    .metadata-label { display: inline-block; min-width: 4.5rem; color: #657286; }
+  </style>
+</head>
+<body>{% include "includes/user_toolbar.html" %}
+  {% include "includes/main_nav.html" %}
+  <h1>{{ title }}</h1>
+  {% if member %}<p>成员：<a href="{% url 'members:detail' member.pk %}">{{ member.name }}</a></p>{% endif %}
+  <form method="get">
+    {% if request.GET.member %}<input type="hidden" name="member" value="{{ request.GET.member }}">{% endif %}
+    <input name="q" value="{{ query }}" placeholder="{% if kind == 'publication' %}论文名称或作者{% else %}名称{% endif %}">
+    {% if kind == "publication" %}<select name="keyword"><option value="">所有关键词</option>{% for keyword in keywords %}<option value="{{ keyword.pk }}" {% if selected_keyword == keyword.pk|stringformat:"s" %}selected{% endif %}>{{ keyword.name }}</option>{% endfor %}</select>{% endif %}
+    <button type="submit">搜索</button>
+  </form>
+  <table>
+    <thead><tr><th>名称</th><th>{% if kind == "publication" %}作者 / 年份 / 关键词{% elif kind == "project" %}状态 / 成员{% else %}专利号 / 状态 / 发明人{% endif %}</th></tr></thead>
+    <tbody>{% for item in items %}<tr>
+      <td>{% if kind == "publication" %}<a href="{% url 'catalog:publication_detail' item.pk %}">{{ item.title }}</a>{% elif kind == "project" %}<a href="{% url 'catalog:project_detail' item.pk %}">{{ item.title }}</a>{% else %}<a href="{% url 'catalog:patent_detail' item.pk %}">{{ item.title }}</a>{% endif %}</td>
+      <td>{% if kind == "publication" %}<div class="metadata"><div class="metadata-row"><span class="metadata-label">作者</span>{{ item.authors|default:"—" }}</div><div class="metadata-row"><span class="metadata-label">年份</span>{{ item.year|default:"年份未录入" }}</div><div class="metadata-row"><span class="metadata-label">关键词</span>{% for keyword in item.keywords.all %}{{ keyword.name }}{% if not forloop.last %}、{% endif %}{% empty %}无关键词{% endfor %}</div></div>{% elif kind == "project" %}{{ item.status|default:"—" }} · {% for person in item.members.all %}{{ person.name }}{% if not forloop.last %}、{% endif %}{% empty %}未关联成员{% endfor %}{% else %}{{ item.patent_number|default:"专利号未录入" }} · {{ item.status|default:"—" }} · {% for person in item.members.all %}{{ person.name }}{% if not forloop.last %}、{% endif %}{% empty %}未关联成员{% endfor %}{% endif %}</td>
+    </tr>{% empty %}<tr><td colspan="2" class="muted">暂无记录。</td></tr>{% endfor %}</tbody>
+  </table>
+</body>
+</html>

@@ -1,0 +1,10 @@
+<!doctype html>
+<html lang="zh-Hans">
+<head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>申请修改资料</title>
+<style>body{font-family:system-ui,sans-serif;max-width:760px;margin:3rem auto;padding:0 1rem;color:#202938}nav{display:flex;gap:1rem;flex-wrap:wrap;border-bottom:1px solid #dce2e8;padding-bottom:1rem}a{color:#155eef}label{display:block;font-weight:600;margin-top:1rem}input,textarea{box-sizing:border-box;width:100%;padding:.65rem;margin-top:.35rem;border:1px solid #b8c2cc;border-radius:.35rem}button{padding:.7rem 1rem;margin-top:1.2rem}ul.errorlist{color:#a4262c}</style></head>
+<body>{% include "includes/user_toolbar.html" %}{% include "includes/main_nav.html" %}
+<h1>申请修改资料</h1><p>申请对象：{{ member.name }}。提交后由管理员或超级管理员审核，通过后才更新正式资料。</p>
+<form method="post">{% csrf_token %}{{ form.non_field_errors }}
+  {% for field in form %}<label for="{{ field.id_for_label }}">{{ field.label }}</label>{{ field }}{{ field.errors }}{% endfor %}
+  <button type="submit">提交申请</button>
+</form></body></html>

@@ -1,0 +1,11 @@
+<!doctype html>
+<html lang="zh-Hans">
+<head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>系统备份</title>
+<style>body{font-family:system-ui,sans-serif;max-width:900px;margin:3rem auto;padding:0 1rem;color:#202938}nav{display:flex;gap:1rem;flex-wrap:wrap;border-bottom:1px solid #dce2e8;padding-bottom:1rem}a{color:#155eef}table{width:100%;border-collapse:collapse;margin-top:1.5rem}th,td{border-bottom:1px solid #dce2e8;padding:.8rem;text-align:left}th{background:#f4f7fa}.muted{color:#657286}</style></head>
+<body>{% include "includes/user_toolbar.html" %}{% include "includes/main_nav.html" %}
+<h1>系统备份</h1><p>备份包含数据库和上传文件目录。请将备份副本保存到与主机分离的存储位置。</p>
+{% for message in messages %}<p class="muted">{{ message }}</p>{% endfor %}
+<form method="post" action="{% url 'system_backups:create' %}">{% csrf_token %}<button type="submit">立即创建备份</button></form>
+<table><thead><tr><th>文件</th><th>大小</th><th>修改时间</th><th>操作</th></tr></thead><tbody>
+{% for item in backups %}<tr><td>{{ item.name }}</td><td>{{ item.size|filesizeformat }}</td><td>{{ item.modified|date:"Y-m-d H:i" }}</td><td><a href="{% url 'system_backups:download' item.name %}">下载</a></td></tr>{% empty %}<tr><td colspan="4" class="muted">尚无备份。请先在服务器运行 backup_system 命令。</td></tr>{% endfor %}
+</tbody></table></body></html>

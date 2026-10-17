@@ -1,0 +1,6 @@
+<!doctype html>
+<html lang="zh-Hans">
+<head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>文献关键词</title>
+<style>body{font-family:system-ui,sans-serif;max-width:800px;margin:3rem auto;padding:0 1rem;color:#202938}nav{display:flex;gap:1rem;flex-wrap:wrap;border-bottom:1px solid #dce2e8;padding-bottom:1rem}a{color:#155eef}.keywords{display:flex;gap:.6rem;flex-wrap:wrap;margin-top:1.5rem}.keywords a{padding:.45rem .8rem;border:1px solid #dce2e8;border-radius:2rem;text-decoration:none}</style></head>
+<body>{% include "includes/user_toolbar.html" %}{% include "includes/main_nav.html" %}
+<h1>文献关键词</h1><div class="keywords">{% for keyword in keywords %}<a href="{% url 'catalog:publications' %}?keyword={{ keyword.pk }}">{{ keyword.name }} · {{ keyword.publications.count }}</a>{% empty %}<p>还没有关键词，请先在管理后台添加文献与关键词。</p>{% endfor %}</div></body></html>

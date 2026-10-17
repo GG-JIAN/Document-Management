@@ -1,0 +1,25 @@
+<!doctype html>
+<html lang="zh-Hans">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>材料特性 · 课题组文献管理系统</title>
+  <style>
+    body { font-family: system-ui, sans-serif; max-width: 960px; margin: 3rem auto; padding: 0 1rem; color: #202938; }
+    nav { display: flex; gap: 1rem; flex-wrap: wrap; border-bottom: 1px solid #dce2e8; padding-bottom: 1rem; }
+    a { color: #155eef; }
+    main { margin-top: 2rem; padding: 1.5rem; border: 1px solid #dce2e8; border-radius: .5rem; background: #f8fafc; }
+    .muted { color: #657286; }
+  </style>
+</head>
+<body>
+  {% include "includes/user_toolbar.html" %}
+  {% include "includes/main_nav.html" %}
+  <main>
+    <h1>材料特性</h1>
+    <p>该板块用于查找课题组研究过的材料特性，并支持选择多种材料进行数据可视化对比。</p>
+    <p class="muted">目前尚未导入材料数据。请在准备好整理表格后提供文件；届时会根据表格字段实现快速查询和对比图表。</p>
+    <p><a href="{% url 'members:list' %}">返回课题组成员</a></p>
+  </main>
+</body>
+</html>

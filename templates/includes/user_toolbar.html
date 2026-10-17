@@ -1,0 +1,6 @@
+{% load static %}<link rel="stylesheet" href="{% static 'members/app.css' %}?v=8">
+<div class="user-toolbar">
+  <span>欢迎，{{ request.user.username }}</span>
+  <a href="{% url 'own_password_change' %}">修改我的密码</a>
+  <form method="post" action="{% url 'logout' %}">{% csrf_token %}<button type="submit">退出登录</button></form>
+</div>
